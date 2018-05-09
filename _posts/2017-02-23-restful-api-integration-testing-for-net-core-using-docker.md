@@ -129,7 +129,7 @@ namespace IntegrationTests
 }
 ```
 
-Note above the ClientTestCollection class is implementing ICollectionFixture<ServiceContainersFixture>. There must also be a definition for the referenced ServiceContainersFixture. This class will be created once for all tests in the test collection, and then disposed when they are complete.
+Note above the `ClientTestCollection` class is implementing `ICollectionFixture<ServiceContainersFixture>`. There must also be a definition for the referenced `ServiceContainersFixture`. This class will be created once for all tests in the test collection, and then disposed when they are complete.
 
 > Note: The example below assumes that "dotnet" and "docker-compose" are accessible in the system PATH. They should be by default.
 
@@ -291,10 +291,10 @@ namespace IntegrationTests
 }
 ```
 
-> **Note:** Before each call to docker-compose, AddEnvironmentVariables is being called to set some environment variables in ProcessStartInfo. These are used by docker-compose to perform substitutions in the YAML file. For example, ${COMPUTERNAME} will be replaced with the name of the development computer. This could be easily extended with other environment variables as needed.
+> **Note:** Before each call to docker-compose, `AddEnvironmentVariables` is being called to set some environment variables in `ProcessStartInfo`. These are used by docker-compose to perform substitutions in the YAML file. For example, `${COMPUTERNAME}` will be replaced with the name of the development computer. This could be easily extended with other environment variables as needed.
 {: .notice--info}
 
-To specify that a test class needs the containers to be running, apply the Collection attribute to the test class. Note how the string "ClientTests" matches the CollectionDefinition attribute used earlier on ClientTestCollection.
+To specify that a test class needs the containers to be running, apply the `Collection` attribute to the test class. Note how the string "ClientTests" matches the `CollectionDefinition` attribute used earlier on `ClientTestCollection`.
 
 ```cs
 [Collection("ClientTests")]

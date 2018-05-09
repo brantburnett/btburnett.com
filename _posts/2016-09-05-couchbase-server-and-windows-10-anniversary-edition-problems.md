@@ -27,15 +27,15 @@ I decided instead to play with Docker, and I was very pleasantly surprised at ho
 4. Right click the Docker icon in your system tray (next to the clock), and open Settings.  Go to Shared Drives, and share your C drive.  This will require your WIndows password.
 5. Open Powershell and run this command to make a data folder:
 
-```powershell
- mkdir $env:userprofile\Couchbase
-```
+    ```powershell
+    mkdir $env:userprofile\Couchbase
+    ```
 
 6. Then run this command to startup the Docker container:
 
-```powershell
-docker run -d --name db -p 8091-8094:8091-8094 -p 11207:11207 -p 11210-11211:11210-11211 -p 18091-18093:18091-18093 -v $env:userprofile/Couchbase:/opt/couchbase/var couchbase
-```
+    ```powershell
+    docker run -d --name db -p 8091-8094:8091-8094 -p 11207:11207 -p 11210-11211:11210-11211 -p 18091-18093:18091-18093 -v ${env:userprofile}/Couchbase:/opt/couchbase/var couchbase
+    ```
 
 7. Once complete, open http://localhost:8091/ to complete server configuration
 

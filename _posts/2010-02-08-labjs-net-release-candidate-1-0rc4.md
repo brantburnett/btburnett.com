@@ -5,7 +5,7 @@ date: 2010-02-08T11:18:27+00:00
 guid: http://btburnett.com/?p=109
 permalink: /2010/02/labjs-net-release-candidate-1-0rc4.html
 categories:
-  - ASP.Net
+  - ASP.NET
 ---
 I've committed release candidate 4 of LABjs.Net at GitHub.  It contains a few minor bug fixes, and also adds a few useful features.
 

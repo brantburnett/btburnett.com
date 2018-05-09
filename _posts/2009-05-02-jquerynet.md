@@ -14,4 +14,4 @@ The only downside of using jQuery with ASP.Net is the lack of integration.  The
 
 I've written a library to help with the creation of ASP.Net server controls that utilize jQuery.  I'm calling it, very creatively, jQuery.Net.  You can access the code and binaries for the library on github, the link's below.
 
-<a href="http://github.com/btburnett3/jquery.net/tree/master" target="_blank">jQuery.Net Git Repository</a>
+[jQuery.Net Git Repository](http://github.com/btburnett3/jquery.net/tree/master)

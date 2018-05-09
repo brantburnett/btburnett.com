@@ -23,6 +23,6 @@ I've also implemented a PartialAuthentication static class that is very similar 
 
 As far as security is concerned, the partial authentication cookie is generated using a FormsAuthenticationTicket just like with FormsAuthentication. It only difference is that the name of the cookie is prepended to the username in the ticket, and on decryption that string is validated. This prevents a client from editing their cookie file to set the secure cookie to have the same value as the insecure cookie. The cookies are encrypted using the same machine authentication keys as the forms authentication tickets, so they should work on web farms in the same manner.
 
-Please note that this library is designed for .NET 3.5 and Visual Studio 2008, though it should be easily<br /> convertible back to .NET 2.0 if you change the project settings.
+Please note that this library is designed for .NET 3.5 and Visual Studio 2008, though it should be easily convertible back to .NET 2.0 if you change the project settings.
 
 > **UPDATE: Please see updated version [here](/2008/08/update-to-partial-authentication-system-2.html)**

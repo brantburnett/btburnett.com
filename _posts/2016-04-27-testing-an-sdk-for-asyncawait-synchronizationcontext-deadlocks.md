@@ -33,7 +33,8 @@ The example above is typically a problem because MVC runs actions inside a [Sync
 
 So why does Step 4 above happen? I know I didn't write any code that requested that the MVC SynchronizationContext be used! Well, if you are using the async/await programming model, you're doing so without even knowing it.
 
-<pre class="brush: csharp; title: ; notranslate" title="">public async Task&lt;SomeResult&gt; SomeActionAsync()
+```cs
+public async Task<SomeResult> SomeActionAsync()
 {
     // do some work
 
@@ -43,7 +44,7 @@ So why does Step 4 above happen? I know I didn't write any code that requested t
 
     return result;
 }
-</pre>
+```
 
 The await above automatically tries to synchronize with the SynchronizationContext. This is actually pretty important for writing async MVC actions. When an async method is awaited in the action, once it's complete we really want the remainder of the action to run within the SynchronizationContext. But within our SDK, we probably don't want that to happen because it usually doesn't have any value to us.
 
