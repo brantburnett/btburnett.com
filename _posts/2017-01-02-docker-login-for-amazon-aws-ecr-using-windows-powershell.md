@@ -10,11 +10,12 @@ categories:
 ---
 My recent studies in .Net Core have lead me to the new world of Docker (new for .Net developers, anyway).  The idea of developing low-cost microservices while still working using  my favorite development platform is very exciting.  In the process, I began using the Amazon AWS Docker platform, Elastic Container Services (ECS).
 
-I quickly found that documentation for using ECS from Windows is a bit scarce.  In particular, the Powershell tools are missing a pretty key helper method, get-login.  Calling &#8220;aws ecr get-login&#8221; on a Linux box delivers you a complete &#8220;docker login&#8221; command for authenticating to the Elastic Container Registry (ECR).  There is currently no such helper for Windows.  At least, not that I can find, someone correct me if I&#8217;m just missing  it.
+I quickly found that documentation for using ECS from Windows is a bit scarce.  In particular, the Powershell tools are missing a pretty key helper method, get-login.  Calling "aws ecr get-login" on a Linux box delivers you a complete "docker login" command for authenticating to the Elastic Container Registry (ECR).  There is currently no such helper for Windows.  At least, not that I can find, someone correct me if I'm just missing  it.
 
-Instead, I&#8217;ve done a bit of digging and found [how to authenticate programatically](https://aws.amazon.com/blogs/compute/authenticating-amazon-ecr-repositories-for-docker-cli-with-credential-helper/).  From that, I&#8217;ve created the helper code below for reuse.
+Instead, I've done a bit of digging and found [how to authenticate programatically](https://aws.amazon.com/blogs/compute/authenticating-amazon-ecr-repositories-for-docker-cli-with-credential-helper/).  From that, I've created the helper code below for reuse.
 
-<pre class="brush: powershell; title: ; notranslate" title=""># Get the authorization token
+```powershell
+# Get the authorization token
 $token = Get-ECRAuthorizationToken -Region us-east-1 -AccessKey your-access-key -SecretKey your-secret-key
 # Split the token into username and password segments
 $tokenSegments = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($token.AuthorizationToken)).Split(":")
@@ -22,18 +23,18 @@ $tokenSegments = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromB
 $hostName = (New-Object System.Uri $token.ProxyEndpoint).DnsSafeHost
 # Perform login
 docker login -u $($tokenSegments[0]) -p $($tokenSegments[1]) -e none $hostName
-</pre>
+```
 
-This login should then be valid for 12 hours. Note that if you use your own Region, AccessKey, and SecretKey on the first line. Alternatively, you could use Set-DefaultAWSRegion and Set-AWSCredentials to store them in your Powershell session. If you&#8217;re on a build server running in AWS you could also use IAM roles to grant access directly to the build server.
+This login should then be valid for 12 hours. Note that if you use your own Region, AccessKey, and SecretKey on the first line. Alternatively, you could use Set-DefaultAWSRegion and Set-AWSCredentials to store them in your Powershell session. If you're on a build server running in AWS you could also use IAM roles to grant access directly to the build server.
 
 ## Update 2/8/2017
 
 You can add the section below to your PowerShell profile to add an easy to use cmdlet. To install:
 
-  1. Run &#8220;notepad $PROFILE&#8221;
+  1. Run "notepad $PROFILE"
   2. Paste the code below into the file and save
-  3. Run &#8220;. $PROFILE&#8221; or restart Powershell
-  4. Run &#8220;Auth-ECR your-access-key your-secretkey&#8221;.
+  3. Run ". $PROFILE" or restart Powershell
+  4. Run "Auth-ECR your-access-key your-secretkey".
 
 ```powershell
 function Auth-ECR {
@@ -67,4 +68,4 @@ function Auth-ECR {
 }
 ```
 
-Note that this script defaults to using the us-east-1 region. You can change the default in your profile, or use &#8220;-Region&#8221; on the command line.
+Note that this script defaults to using the us-east-1 region. You can change the default in your profile, or use "-Region" on the command line.

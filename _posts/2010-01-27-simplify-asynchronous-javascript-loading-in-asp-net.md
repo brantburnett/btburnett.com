@@ -6,14 +6,12 @@ guid: http://btburnett.com/?p=100
 permalink: /2010/01/simplify-asynchronous-javascript-loading-in-asp-net.html
 categories:
   - ASP.NET
-  - Javascript
-  - jQuery
 ---
 [LABjs](http://labjs.com) is an excellent javascript library that performs asynchronous loading of javascript files. This can help to greatly increase the load speed of your web pages. Now, instead of blocking while one file is being downloaded, other scripts further down the chain can be downloaded while waiting. On top of that, it can maintain processing order, waiting to process certain scripts until others are complete, and optionally executing code on completion.
 
 All of this is great for the client side. But how do you define which scripts to include in the LABjs chain on the server side?
 
-Since for work I primarily operate in ASP.Net, I&#8217;ve created an ASP.Net solution to the problem, LABjs.Net. This library provides two key controls, LabScriptManager and LabScriptManagerProxy. These controls loosely follow the behavior of the AJAX ScriptManager and ScriptManagerProxy controls, at least their script loading aspects.
+Since for work I primarily operate in ASP.Net, I've created an ASP.Net solution to the problem, LABjs.Net. This library provides two key controls, LabScriptManager and LabScriptManagerProxy. These controls loosely follow the behavior of the AJAX ScriptManager and ScriptManagerProxy controls, at least their script loading aspects.
 
 Key supported features include:
 
@@ -35,4 +33,4 @@ Below you will find links to the current release candidate, 1.0rc1.  Please rev
 
 [Git Repository](http://github.com/btburnett3/LABjs.Net)
 
-**Update 2/8/2010:** [Updated to version 1.0rc4](http://btburnett.com/2010/02/labjs-net-release-candidate-1-0rc4.html)
+**Update 2/8/2010:** [Updated to version 1.0rc4](/2010/02/labjs-net-release-candidate-1-0rc4.html)

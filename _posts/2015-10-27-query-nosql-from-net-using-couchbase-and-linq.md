@@ -13,8 +13,8 @@ Couchbase recently helped to address this limitation with the release of N1QL (a
 
 Now, Couchbase has [announced the release of their Couchbase LINQ Provider](http://blog.couchbase.com/2015/october/linq-n1ql-and-couchbase-oh-mai-linq2couchbase-ga) for .Net.  The provider is [available as a Nuget package](https://www.nuget.org/packages/Linq2Couchbase/) which adds support to the existing SDK.
 
-For .Net developers, using the LINQ provider for Couchbase makes the learning curve even shallower.  With just a few exceptions, developers trained to write queries using LINQ with NHibernate or Entity Framework can make the transition without learning any new syntax.  Plus, due to Couchbase&#8217;s JSON document data structure, the LINQ provider adds support for a variety of N1QL features that aren&#8217;t possible with more traditional table-based data stores.
+For .Net developers, using the LINQ provider for Couchbase makes the learning curve even shallower.  With just a few exceptions, developers trained to write queries using LINQ with NHibernate or Entity Framework can make the transition without learning any new syntax.  Plus, due to Couchbase's JSON document data structure, the LINQ provider adds support for a variety of N1QL features that aren't possible with more traditional table-based data stores.
 
-So, if you&#8217;re a .Net developer interested in NoSQL and big data, I strongly encourage you to check it out.  It&#8217;s a big step in bringing the performance and scalability of NoSQL to the masses without the headaches.
+So, if you're a .Net developer interested in NoSQL and big data, I strongly encourage you to check it out.  It's a big step in bringing the performance and scalability of NoSQL to the masses without the headaches.
 
-Disclaimer:  I&#8217;m a extra excited about this release because it is an open source project I was able to contribute to.  You can [see the source code on GitHub](https://github.com/couchbaselabs/Linq2Couchbase).
+Disclaimer:  I'm a extra excited about this release because it is an open source project I was able to contribute to.  You can [see the source code on GitHub](https://github.com/couchbaselabs/Linq2Couchbase).

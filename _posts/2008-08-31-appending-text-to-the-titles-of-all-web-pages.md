@@ -4,120 +4,110 @@ title: Appending Text To The Titles Of All Web Pages
 date: 2008-08-31T08:35:00+00:00
 guid: http://www.btburnett.com/?p=21
 permalink: /2008/08/appending-text-to-the-titles-of-all-web-pages.html
-blogger_blog:
-  - blog.btburnett.com
-blogger_author:
-  - Brant Burnetthttp://www.blogger.com/profile/16900775048939119568noreply@blogger.com
-blogger_permalink:
-  - /2008/08/appending-text-to-titles-of-all-web.html
 categories:
   - ASP.NET
 ---
-<span style="font-size:85%;">Have you ever wanted to add a text string, like an application name, to the title of all your web pages. It&#8217;s easy to do using the control adapters available in ASP.NET 2.0 and later. First, create a new .browser file in the App_Browsers folder of your application, or add this entry to an existing file. Be sure to substitute MyNamespace for the correct namespace where the class is located.</p>
+Have you ever wanted to add a text string, like an application name, to the title of all your web pages. It's easy to do using the control adapters available in ASP.NET 2.0 and later. First, create a new .browser file in the App_Browsers folder of your application, or add this entry to an existing file. Be sure to substitute MyNamespace for the correct namespace where the class is located.
 
-<pre class="csharpcode"><span class="kwrd">&lt;</span><span class="html">browsers</span><span class="kwrd">&gt;</span>
+```xml
+<browsers>
 
-  <span class="kwrd">&lt;</span><span class="html">browser</span> <span class="attr">refID</span><span class="kwrd">="Default"</span><span class="kwrd">&gt;</span>
-    <span class="kwrd">&lt;</span><span class="html">controlAdapters</span><span class="kwrd">&gt;</span>
-      <span class="kwrd">&lt;</span><span class="html">adapter</span> <span class="attr">controlType</span><span class="kwrd">="System.Web.UI.HtmlControls.HtmlHead"</span>
-               <span class="attr">adapterType</span><span class="kwrd">="MyNamespace.TitleAdapter"</span> <span class="kwrd">/&gt;</span>
-    <span class="kwrd">&lt;/</span><span class="html">controlAdapters</span><span class="kwrd">&gt;</span>
-  <span class="kwrd">&lt;/</span><span class="html">browser</span><span class="kwrd">&gt;</span>
+  <browser refID="Default">
+    <controlAdapters>
+      <adapter controlType="System.Web.UI.HtmlControls.HtmlHead"
+               adapterType="MyNamespace.TitleAdapter" />
+    </controlAdapters>
+  </browser>
 
-<span class="kwrd">&lt;/</span><span class="html">browsers</span><span class="kwrd">&gt;</span></pre>
+</browsers>
+```
 
-<p>
-  Now create the TitleAdapter class that is referenced by the .browser file:
-</p>
+Now create the TitleAdapter class that is referenced by the .browser file:
 
-<pre class="csharpcode"><span class="kwrd">Imports</span> System.Web.UI.Adapters
+```vb
+Imports System.Web.UI.Adapters
 
-<span class="kwrd">Public</span> <span class="kwrd">Class</span> TitleAdapter
-    <span class="kwrd">Inherits</span> ControlAdapter
+Public Class TitleAdapter
+    Inherits ControlAdapter
 
-    <span class="kwrd">Private</span> <span class="kwrd">Shared</span> _titleAppendString <span class="kwrd">As</span> <span class="kwrd">String</span> = <span class="str">" - Your Application Name Here"</span>
-    <span class="kwrd">Public</span> <span class="kwrd">Shared</span> <span class="kwrd">Property</span> TitleAppendString() <span class="kwrd">As</span> <span class="kwrd">String</span>
-        <span class="kwrd">Get</span>
-            <span class="kwrd">Return</span> _titleAppendString
-        <span class="kwrd">End</span> <span class="kwrd">Get</span>
-        <span class="kwrd">Set</span>(<span class="kwrd">ByVal</span> value <span class="kwrd">As</span> <span class="kwrd">String</span>)
+    Private Shared _titleAppendString As String = " - Your Application Name Here"
+    Public Shared Property TitleAppendString() As String
+        Get
+            Return _titleAppendString
+        End Get
+        Set(ByVal value As String)
             _titleAppendString = value
-        <span class="kwrd">End</span> <span class="kwrd">Set</span>
-    <span class="kwrd">End</span> <span class="kwrd">Property</span>
+        End Set
+    End Property
 
-    <span class="kwrd">Protected</span> <span class="kwrd">Overrides</span> <span class="kwrd">Sub</span> Render(<span class="kwrd">ByVal</span> writer <span class="kwrd">As</span> System.Web.UI.HtmlTextWriter)
-        <span class="kwrd">MyBase</span>.Render(<span class="kwrd">New</span> TitleAdapterHtmlTextWriter(writer, TitleAppendString))
-    <span class="kwrd">End</span> <span class="kwrd">Sub</span>
+    Protected Overrides Sub Render(ByVal writer As System.Web.UI.HtmlTextWriter)
+        MyBase.Render(New TitleAdapterHtmlTextWriter(writer, TitleAppendString))
+    End Sub
 
-<span class="kwrd">End</span> <span class="kwrd">Class</span></pre>
+End Class
+```
 
-<p>
-  And finally, create the HtmlTextWriter that is referenced by the control adapter:
-</p>
+And finally, create the HtmlTextWriter that is referenced by the control adapter:
 
-<pre class="csharpcode"><span class="kwrd">Public</span> <span class="kwrd">Class</span> TitleAdapterHtmlTextWriter
-    <span class="kwrd">Inherits</span> HtmlTextWriter
+```vb
+Public Class TitleAdapterHtmlTextWriter
+    Inherits HtmlTextWriter
 
-    <span class="kwrd">Public</span> <span class="kwrd">Sub</span> <span class="kwrd">New</span>(<span class="kwrd">ByVal</span> writer <span class="kwrd">As</span> HtmlTextWriter, <span class="kwrd">ByVal</span> appendString <span class="kwrd">As</span> <span class="kwrd">String</span>)
-        <span class="kwrd">MyBase</span>.<span class="kwrd">New</span>(writer)
+    Public Sub New(ByVal writer As HtmlTextWriter, ByVal appendString As String)
+        MyBase.New(writer)
         InnerWriter = writer.InnerWriter
 
         _appendString = appendString
-    <span class="kwrd">End</span> <span class="kwrd">Sub</span>
+    End Sub
 
-    <span class="kwrd">Public</span> <span class="kwrd">Sub</span> <span class="kwrd">New</span>(<span class="kwrd">ByVal</span> writer <span class="kwrd">As</span> System.IO.TextWriter, <span class="kwrd">ByVal</span> appendString <span class="kwrd">As</span> <span class="kwrd">String</span>)
-        <span class="kwrd">MyBase</span>.<span class="kwrd">New</span>(writer)
+    Public Sub New(ByVal writer As System.IO.TextWriter, ByVal appendString As String)
+        MyBase.New(writer)
         InnerWriter = writer
 
         _appendString = appendString
-    <span class="kwrd">End</span> <span class="kwrd">Sub</span>
+    End Sub
 
-    <span class="kwrd">Private</span> _appendString <span class="kwrd">As</span> <span class="kwrd">String</span>
+    Private _appendString As String
 
-    <span class="kwrd">Private</span> _renderingTitle <span class="kwrd">As</span> <span class="kwrd">Boolean</span> = <span class="kwrd">False</span>
-    <span class="kwrd">Private</span> _nestedCount <span class="kwrd">As</span> <span class="kwrd">Integer</span>
+    Private _renderingTitle As Boolean = False
+    Private _nestedCount As Integer
 
-    <span class="kwrd">Public</span> <span class="kwrd">Overrides</span> <span class="kwrd">Sub</span> RenderBeginTag(<span class="kwrd">ByVal</span> tagName <span class="kwrd">As</span> <span class="kwrd">String</span>)
-        <span class="kwrd">If</span> _renderingTitle <span class="kwrd">Then</span>
+    Public Overrides Sub RenderBeginTag(ByVal tagName As String)
+        If _renderingTitle Then
             _nestedCount += 1
-        <span class="kwrd">ElseIf</span> <span class="kwrd">String</span>.Equals(tagName, <span class="str">"title"</span>, StringComparison.InvariantCultureIgnoreCase) <span class="kwrd">Then</span>
-            _renderingTitle = <span class="kwrd">True</span>
+        ElseIf String.Equals(tagName, "title", StringComparison.InvariantCultureIgnoreCase) Then
+            _renderingTitle = True
             _nestedCount = 0
-        <span class="kwrd">End</span> <span class="kwrd">If</span>
+        End If
 
-        <span class="kwrd">MyBase</span>.RenderBeginTag(tagName)
-    <span class="kwrd">End</span> <span class="kwrd">Sub</span>
+        MyBase.RenderBeginTag(tagName)
+    End Sub
 
-    <span class="kwrd">Public</span> <span class="kwrd">Overrides</span> <span class="kwrd">Sub</span> RenderBeginTag(<span class="kwrd">ByVal</span> tagKey <span class="kwrd">As</span> System.Web.UI.HtmlTextWriterTag)
-        <span class="kwrd">If</span> _renderingTitle <span class="kwrd">Then</span>
+    Public Overrides Sub RenderBeginTag(ByVal tagKey As System.Web.UI.HtmlTextWriterTag)
+        If _renderingTitle Then
             _nestedCount += 1
-        <span class="kwrd">ElseIf</span> tagKey = HtmlTextWriterTag.Title <span class="kwrd">Then</span>
-            _renderingTitle = <span class="kwrd">True</span>
+        ElseIf tagKey = HtmlTextWriterTag.Title Then
+            _renderingTitle = True
             _nestedCount = 0
-        <span class="kwrd">End</span> <span class="kwrd">If</span>
+        End If
 
-        <span class="kwrd">MyBase</span>.RenderBeginTag(tagKey)
-    <span class="kwrd">End</span> <span class="kwrd">Sub</span>
+        MyBase.RenderBeginTag(tagKey)
+    End Sub
 
-    <span class="kwrd">Public</span> <span class="kwrd">Overrides</span> <span class="kwrd">Sub</span> RenderEndTag()
-        <span class="kwrd">If</span> _renderingTitle <span class="kwrd">Then</span>
-            <span class="kwrd">If</span> _nestedCount &gt; 0 <span class="kwrd">Then</span>
+    Public Overrides Sub RenderEndTag()
+        If _renderingTitle Then
+            If _nestedCount > 0 Then
                 _nestedCount -= 1
-            <span class="kwrd">Else</span>
-                _renderingTitle = <span class="kwrd">False</span>
+            Else
+                _renderingTitle = False
                 Write(_appendString)
-            <span class="kwrd">End</span> <span class="kwrd">If</span>
-        <span class="kwrd">End</span> <span class="kwrd">If</span>
+            End If
+        End If
 
-        <span class="kwrd">MyBase</span>.RenderEndTag()
-    <span class="kwrd">End</span> <span class="kwrd">Sub</span>
+        MyBase.RenderEndTag()
+    End Sub
 
-<span class="kwrd">End</span> <span class="kwrd">Class</span></pre>
+End Class
+```
 
-<p>
-  Note that you can edit the text string in the TitleAdapter class. Additionally, it is a static variable so you can alter it at startup from a database column in your Global.asax file.
-</p>
-
-<p>
-  </span>
-</p>
+Note that you can edit the text string in the TitleAdapter class. Additionally, it is a static variable so you can alter it at startup from a database column in your Global.asax file.

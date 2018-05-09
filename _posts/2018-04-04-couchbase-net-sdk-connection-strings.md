@@ -41,7 +41,7 @@ Or:
 
 ## Connection Strings
 
-While the &#8220;servers&#8221; collection is fully functional, it can make overriding settings across different deployment environments cumbersome. This is especially true for .NET Core, where individual settings will often be overridden using [environment variables](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?tabs=basicconfiguration#configuration-by-environment).
+While the "servers" collection is fully functional, it can make overriding settings across different deployment environments cumbersome. This is especially true for .NET Core, where individual settings will often be overridden using [environment variables](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?tabs=basicconfiguration#configuration-by-environment).
 
 Version 2.5.9 of the Couchbase .NET SDK adds support for couchbase:// connection strings, which define all details about the servers in a single string. This makes per-environment overrides much easier:
 
@@ -62,28 +62,28 @@ Or:
 }
 ```
 
-> **Note:** If you mix the old &#8220;servers&#8221; method with the &#8220;connectionString&#8221; method, the connection string will take precedence.
+> **Note:** If you mix the old "servers" method with the "connectionString" method, the connection string will take precedence.
 {: .notice--info}
 
 ## Connection String Syntax
 
 The connection string supports 3 schemes:
 
-* **couchbase://** &#8211; Bootstraps using CCCP with a fallback to HTTP
-* **couchbases://** &#8211; The same as &#8220;couchbase://&#8221;, except using TLS encryption
-* <http://** &#8211; Legacy HTTP bootstrap
+* `couchbase://` &#8211; Bootstraps using CCCP with a fallback to HTTP
+* `couchbases://` &#8211; The same as "couchbase://", except using TLS encryption
+* `http://` &#8211; Legacy HTTP bootstrap
 
 This is followed by one or more servers, separated by commas. Each server may have a port number as well, though port numbers are not required unless your cluster uses non-standard ports.
 
 Examples:
 
-* couchbase://server1,10.0.0.10:11210,server3
-* couchbases://server1:11207,server2:11207,server3:11207
-* http://server1:8091
+* `couchbase://server1,10.0.0.10:11210,server3`
+* `couchbases://server1:11207,server2:11207,server3:11207`
+* `http://server1:8091`
 
 ## Using Connection Strings In Kubernetes
 
-As a further example, here&#8217;s how connection strings could be used when deploying a .NET Core service to Kubernetes:
+As a further example, here's how connection strings could be used when deploying a .NET Core service to Kubernetes:
 
 First, create a secret with the credentials and connection string:
 
@@ -94,7 +94,7 @@ kubectl create secret generic couchbase \
   --from-literal=password=password
 ```
 
-Then, when deploying the application, override the configuration using environment variables from the secret. The key values are in the &#8220;env:&#8221; tag of the YAML file below:
+Then, when deploying the application, override the configuration using environment variables from the secret. The key values are in the "env:" tag of the YAML file below:
 
 ```yaml
 kind: ReplicaSet

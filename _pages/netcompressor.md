@@ -16,13 +16,13 @@ jd_style_this:
 ---
 NetCompressor is a simple tool for Visual Studio 2008 which performs compression on your javascript and CSS files at design-time.  A secondary, compressed copy is stored in the project with .min added before the extension.  For example, style.css becomes style.min.css.
 
-To use, simply install the tool and set the &#8220;Custom Tool&#8221; property of your CSS or javascript file to &#8220;NetCompressorCSS&#8221; or &#8220;NetCompressorJS&#8221; respectively.  You can use the Show All Files button in your solution explorer to see the files that are added beneath the originals.
+To use, simply install the tool and set the "Custom Tool" property of your CSS or javascript file to "NetCompressorCSS" or "NetCompressorJS" respectively.  You can use the Show All Files button in your solution explorer to see the files that are added beneath the originals.
 
 NetCompressor uses the [YUI Compressor](http://developer.yahoo.com/yui/compressor/) for CSS files, and the [Google Closure](http://code.google.com/closure/) compiler in simple optimizations mode for javascript files.
 
 ## Known Issues
 
-If you are using the Visual Studio publishing feature, you must be sure to Show All Files in your solution explorer prior to performing the publish.  If you don&#8217;t, Visual Studio will not publish the minified versions of your files.  If anyone knows a way to get around this issue in Visual Studio, please let me know.
+If you are using the Visual Studio publishing feature, you must be sure to Show All Files in your solution explorer prior to performing the publish.  If you don't, Visual Studio will not publish the minified versions of your files.  If anyone knows a way to get around this issue in Visual Studio, please let me know.
 
 ## Prerequisites
 

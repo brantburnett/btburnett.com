@@ -15,16 +15,16 @@ According to the [C# Programming Guide](https://docs.microsoft.com/en-us/dotnet/
 
 > When a class or struct implements an interface, the class or struct must provide an implementation for all of the members that the interface defines. The interface itself provides no functionality that a class or struct can inherit in the way that it can inherit base class functionality.
 
-There is a [new feature in the works for C# 8](https://www.infoq.com/news/2017/04/Clr-Default-Methods) that will provide default interface implementations. However, I&#8217;m known for my impatience, and I don&#8217;t want to wait. The fact is, interfaces **can** have implementations in C# today.
+There is a [new feature in the works for C# 8](https://www.infoq.com/news/2017/04/Clr-Default-Methods) that will provide default interface implementations. However, I'm known for my impatience, and I don't want to wait. The fact is, interfaces **can** have implementations in C# today.
 
-**Note:** At this point, I&#8217;d like to give a shout out to the ASP.NET Core team. I can&#8217;t really take credit for this concept, I learned it by digging through the [ASP.NET Core source on GitHub](https://github.com/aspnet).
+**Note:** At this point, I'd like to give a shout out to the ASP.NET Core team. I can't really take credit for this concept, I learned it by digging through the [ASP.NET Core source on GitHub](https://github.com/aspnet).
 {: .notice--info}
 
 ## The Magic of Extension Methods
 
-When I first encountered extension methods, I viewed them as a helpful way to add functionality to third-party classes. Adding additional logic to System.DateTime is helpful, right? However, another powerful use case is to create extensions for your own interfaces. When you write an extension method for an interface, you&#8217;re actually providing it with implementation. Sure, the consumer may need an extra using statement at the top of the file, but it&#8217;s still an implementation! Taking this approach has several advantages:
+When I first encountered extension methods, I viewed them as a helpful way to add functionality to third-party classes. Adding additional logic to System.DateTime is helpful, right? However, another powerful use case is to create extensions for your own interfaces. When you write an extension method for an interface, you're actually providing it with implementation. Sure, the consumer may need an extra using statement at the top of the file, but it's still an implementation! Taking this approach has several advantages:
 
-* Extension methods can be safely added to interfaces without risking backward compatibility for consumers (especially if they&#8217;re in a separate namespace).
+* Extension methods can be safely added to interfaces without risking backward compatibility for consumers (especially if they're in a separate namespace).
 * The interface becomes easier to implement there are few methods on the interface itself which must be implemented.
 * There is guaranteed consistency in method implementation across all class implementations.
 
@@ -40,9 +40,9 @@ Instead, the LINQ team implemented their system as extension methods. The result
 
 # So, Teach Me The Magic
 
-Writing extension methods is actually relatively painless. They&#8217;re basically just syntactic sugar layered on top of static methods.
+Writing extension methods is actually relatively painless. They're basically just syntactic sugar layered on top of static methods.
 
-Let&#8217;s start with this interface:
+Let's start with this interface:
 
 ```cs
 namespace MyNamespace
@@ -54,7 +54,7 @@ namespace MyNamespace
 }
 ```
 
-Now, let&#8217;s add an extension method that returns the count of all values in the list greater than a threshold.
+Now, let's add an extension method that returns the count of all values in the list greater than a threshold.
 
 ```cs
 namespace MyNamespace
@@ -91,7 +91,7 @@ There are four key pieces to the puzzle:
 
 1. MyInterfaceExtensions and CountGreaterThan are both public (though they could be internal if you want to use them only within your library).
 2. MyInterfaceExtensions and CountGreaterThan are both static.
-3. The first parameter of CountGreaterThan is the interface and is preceded by the &#8220;this&#8221; keyword.
+3. The first parameter of CountGreaterThan is the interface and is preceded by the "this" keyword.
 4. The file where DoSomething is declared includes a using statement for the namespace where the extensions are declared (Visual Studio will help by adding this automatically).
 
 **Note:** There are many different approaches for code organization surrounding these extensions methods. Some teams may prefer them in the same file, others in a separate file in the same folder, and others may want extensions in a separate folder/namespace. Just be sure your team picks a pattern and sticks with it. For teams that choose separate files, including comments on the interface that point to the extension files is a good idea.
@@ -99,9 +99,9 @@ There are four key pieces to the puzzle:
 
 ## Making Mocks Easy, One Extension Method At A Time
 
-My favorite use case is for supporting unit tests, especially when I&#8217;m providing lots of method overloads. The reason I point out this specific use case it to show that extension methods can be very useful outside of developing reusable libraries. Almost all development today requires unit testing.
+My favorite use case is for supporting unit tests, especially when I'm providing lots of method overloads. The reason I point out this specific use case it to show that extension methods can be very useful outside of developing reusable libraries. Almost all development today requires unit testing.
 
-When writing unit tests, it&#8217;s often best to test against mocks of interfaces, rather than real implementations. The reasons why are beyond the scope of this post, so just trust me on this. I used to think it was silly until I learned the hard way it wasn&#8217;t. Creating mocks can be greatly simplified by adding implementation to interfaces.
+When writing unit tests, it's often best to test against mocks of interfaces, rather than real implementations. The reasons why are beyond the scope of this post, so just trust me on this. I used to think it was silly until I learned the hard way it wasn't. Creating mocks can be greatly simplified by adding implementation to interfaces.
 
 For example, imagine an interface named ICartItem which represents an item in an online shopping cart. It needs several different methods to support changing the quantity in the cart.
 
@@ -171,7 +171,7 @@ There are lots of great examples of this pattern found throughout the ASP.NET Co
 
 ## Summary
 
-That&#8217;s how to add implementations to interfaces in a nutshell. It&#8217;s a very powerful tool but is especially useful for writing shared libraries as well as for writing code that is easy to unit test. Key use cases to watch out for include:
+That's how to add implementations to interfaces in a nutshell. It's a very powerful tool but is especially useful for writing shared libraries as well as for writing code that is easy to unit test. Key use cases to watch out for include:
 
 * Overloads where simpler methods are just forwarding the requests to methods with more parameters and filling in default values. The simpler methods can be extensions.
 * Helper methods that support more common uses cases by forwarding method calls to more powerful but less frequently used methods.

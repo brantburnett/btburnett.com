@@ -6,11 +6,10 @@ guid: http://www.btburnett.com/?p=7
 permalink: /2008/04/linking-stylesheets-from-content-pages.html
 categories:
   - ASP.NET
-  - CSS
 ---
-Personally, I find stylesheets to be the best way to apply formating to web pages. Skins certainly have their uses, but they tend to pad out the HTML with lots of redundant information that can be avoided by referencing a stylesheet, thus reducing download times. Stylesheets can be easily added to themes, but sometimes you don&#8217;t want to reference all of your stylesheets on every page, which is what happens if you put stylesheets into a theme.
+Personally, I find stylesheets to be the best way to apply formating to web pages. Skins certainly have their uses, but they tend to pad out the HTML with lots of redundant information that can be avoided by referencing a stylesheet, thus reducing download times. Stylesheets can be easily added to themes, but sometimes you don't want to reference all of your stylesheets on every page, which is what happens if you put stylesheets into a theme.
 
-When using master and content pages, this can be a bit tricky. The common solution isn&#8217;t all that difficult, you just have to add a content section inside the header of your master page.
+When using master and content pages, this can be a bit tricky. The common solution isn't all that difficult, you just have to add a content section inside the header of your master page.
 
 ```html
 <% Master Language="VB" AutoEventWireup="false" CodeBehind="SystemMaster.Master.vb" Inherits="MyWebApp.SystemMaster" %>
@@ -42,9 +41,9 @@ Then on your content page:
 </asp:Content>
 ```
 
-Now this works great for most scenarios, but what if you&#8217;re using URL rewriting in order to dynamically generate your pages based on the URL that was requested? In that case, the relative path to the stylesheet won&#8217;t work. If you know that your web application will always be the root application on the server, you can use a path that starts with /, but that isn&#8217;t always the case. What you really need to do is use an application relative path, starting with a ~/.
+Now this works great for most scenarios, but what if you're using URL rewriting in order to dynamically generate your pages based on the URL that was requested? In that case, the relative path to the stylesheet won't work. If you know that your web application will always be the root application on the server, you can use a path that starts with /, but that isn't always the case. What you really need to do is use an application relative path, starting with a ~/.
 
-Normally you can change your **link** tag to include **runat="server"** and it will process application relative paths in the **href** attribute. However, this doesn&#8217;t work on content pages for some reason. Therefore, I&#8217;ve created the class below to help.
+Normally you can change your **link** tag to include **runat="server"** and it will process application relative paths in the **href** attribute. However, this doesn't work on content pages for some reason. Therefore, I've created the class below to help.
 
 ```vb
 Imports System
@@ -128,4 +127,4 @@ Now you replace the **link** tag on the content page with this:
 <cc1:SmartLink runat="server rel="stylesheet" type="text/css" href="~/styles/style.css" />
 ```
 
-That&#8217;s it, now you have an application relative stylesheet link on your content page that works with URL rewriting.
+That's it, now you have an application relative stylesheet link on your content page that works with URL rewriting.

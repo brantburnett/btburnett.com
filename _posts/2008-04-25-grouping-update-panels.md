@@ -15,11 +15,11 @@ The most common and simplest method of AJAX development on ASP.NET is to use the
 2. The Update method is explicitly called.
 3. A manually defined trigger is fired.
 
-However, this doesn&#8217;t help with firing the other UpdatePanels on the page that are related. While you can update the other panels manually using the Update method or triggers, that can potentially be a lot of work and difficult to maintain.
+However, this doesn't help with firing the other UpdatePanels on the page that are related. While you can update the other panels manually using the Update method or triggers, that can potentially be a lot of work and difficult to maintain.
 
-In order to address this, I&#8217;ve created a simple GroupedUpdatePanel. It has a GroupName property which is used to group multiple GroupedUpdatePanels together. If any one UpdatePanel in a group is updated as part of an asynchronous postback, they will all be updated.
+In order to address this, I've created a simple GroupedUpdatePanel. It has a GroupName property which is used to group multiple GroupedUpdatePanels together. If any one UpdatePanel in a group is updated as part of an asynchronous postback, they will all be updated.
 
-There are two important restrictions to note. First, you must set UpdateMode to Conditional. If any one GroupedUpdatePanel in a group is set to Always, they will all update every time. This is a result of the limitations of inheriting from the UpdatePanel class. Second, all of the UpdatePanels must be created and on the page at the time the PreRender event occurs. I&#8217;ve seen some reports on the web of certain situations where this is not the case, though I haven&#8217;t tested for any of it.
+There are two important restrictions to note. First, you must set UpdateMode to Conditional. If any one GroupedUpdatePanel in a group is set to Always, they will all update every time. This is a result of the limitations of inheriting from the UpdatePanel class. Second, all of the UpdatePanels must be created and on the page at the time the PreRender event occurs. I've seen some reports on the web of certain situations where this is not the case, though I haven't tested for any of it.
 
 You can download the source for the control here. Feel free to use it in your own applications.
 
