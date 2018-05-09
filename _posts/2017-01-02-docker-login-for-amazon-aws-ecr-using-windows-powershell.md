@@ -5,8 +5,6 @@ date: 2017-01-02T15:41:41+00:00
 guid: http://btburnett.com/?p=241
 permalink: /2017/01/docker-login-for-amazon-aws-ecr-using-windows-powershell.html
 categories:
-  - Uncategorized
-tags:
   - Docker
   - .NET Core
 ---
