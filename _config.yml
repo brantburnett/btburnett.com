@@ -1,0 +1,106 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+title: RandomDev
+name: Brant Burnett
+email: btburnett3@gmail.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Random development on many topics (but especially .NET and Couchbase)
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://btburnett.com" # the base hostname & protocol for your site, e.g. http://example.com
+twitter_username: btburnett3
+github_username:  brantburnett
+
+author:
+  name   : "Brant Burnett"
+  avatar : "/assets/images/brant.jpeg"
+  bio    : >-
+    Brant Burnett is a Couchbase Community Expert, systems architect,
+    and .NET developer experienced in desktop and web full stack development.
+    For the last 13 years, he has been working with CenterEdge Software
+    developing applications for all segments of their software suite.
+  twitter: btburnett3
+  linkedin: btburnett3
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+include:
+  - _pages
+feed:
+  path: feed
+
+# Theme settings
+theme: minimal-mistakes-jekyll
+show_excerpts: true
+minimal_mistakes_skin: dark
+locale: en-US
+paginate: 5
+atom_feed:
+  path: /feed
+analytics:
+  provider: google-universal
+  google:
+    tracking_id: "UA-3959447-1"
+
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: true
+      share: true
+      related: true
+      classes: wide
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+
+# Archives
+
+category_archive:
+  type: jekyll-archives
+  path: /categories/
+jekyll-archives:
+  enabled:
+    - categories
+  layouts:
+    category: archive-taxonomy
+  permalinks:
+    category: /categories/:name/
+
+# Exclude from processing.
+# The following items will not be processed, by default. Create a custom list
+# to override the default setting.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .vscode/
+  - .gitignore
+  - .editorconfig
+  - .markdownlint.json
