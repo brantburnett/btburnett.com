@@ -38,6 +38,7 @@ author:
 markdown: kramdown
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
 include:
   - _pages
 feed:
