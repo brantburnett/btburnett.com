@@ -25,4 +25,4 @@ You might also need to run the following afterwards:
 ALTER DATABASE dbname SET NEW_BROKER.
 ```
 
-Also, see my previous post [SQL Server 2005 Service Broker Error 15517](/2008/05/sql-server-2005-service-broker-error.html) for another error message and solution.
+Also, see my previous post [SQL Server 2005 Service Broker Error 15517](/2008/05/sql-server-2005-service-broker-error-15517.html) for another error message and solution.

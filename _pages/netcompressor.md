@@ -18,7 +18,7 @@ NetCompressor is a simple tool for Visual Studio 2008 which performs compression
 
 To use, simply install the tool and set the "Custom Tool" property of your CSS or javascript file to "NetCompressorCSS" or "NetCompressorJS" respectively.  You can use the Show All Files button in your solution explorer to see the files that are added beneath the originals.
 
-NetCompressor uses the [YUI Compressor](http://developer.yahoo.com/yui/compressor/) for CSS files, and the [Google Closure](http://code.google.com/closure/) compiler in simple optimizations mode for javascript files.
+NetCompressor uses the [YUI Compressor](http://yui.github.io/yuicompressor/) for CSS files, and the [Google Closure](http://code.google.com/closure/) compiler in simple optimizations mode for javascript files.
 
 ## Known Issues
 

@@ -11,6 +11,6 @@ I've uploaded a revised jQuery UI Spinner widget, version 1.10, based upon a lot
 
 [jquery.ui.spinner Git Repository](http://github.com/btburnett3/jquery.ui.spinner)
 
-[jQuery UI Spinner Widget Example](/spinner/example/example.html)
+[jQuery UI Spinner Widget Example](/assets/spinner/example/example.html)
 
 As it turns out, the jQuery UI team already had a spinner widget sitting in their files that hadn't been worked on in a while, so I'm working with Ca-Phun Ung to see if we can finish getting it up-to-date, polished, and with some of the new features from my widget incorporated into it. Stay tuned for more info.
