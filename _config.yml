@@ -57,6 +57,10 @@ analytics:
   provider: google-universal
   google:
     tracking_id: "UA-3959447-1"
+comments:
+  provider: disqus
+  disqus:
+    shortname: btburnett3
 
 defaults:
   # _posts
