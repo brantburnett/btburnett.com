@@ -24,21 +24,23 @@ Unfortunately, N1QL doesn't currently offer a wildcard option, so there is no qu
 If you're running on Linux (you should be for production clusters), the solution is to use this script:
 
 ```sh
-#!/bin/sh
+#!/bin/bash
 
 QUERY_HOST=http://localhost:8091
+USERNAME=Administrator
+PASSWORD=password
 
 for i in "BucketName1" "BucketName2" "BucketName3"
 do
-  /opt/couchbase/bin/cbq -e $QUERY_HOST -s="$( \
-    echo "BUILD INDEX ON $i (\`$( \
-      /opt/couchbase/bin/cbq -e $QUERY_HOST -q=true -s="SELECT name FROM system:indexes where keyspace_id = '$i' AND state = 'deferred'" | \
+  /opt/couchbase/bin/cbq -e $QUERY_HOST -u $USERNAME -p $PASSWORD -s="$( \
+    echo "BUILD INDEX ON \`$i\` (\`$( \
+      /opt/couchbase/bin/cbq -e $QUERY_HOST -u $USERNAME -p $PASSWORD -q=true -s="SELECT name FROM system:indexes where keyspace_id = '$i' AND state = 'deferred'" | \
         sed -n -e '/{/,$p' | \
         jq -r '.results[].name' | \
         sed ':a;/.*/{N;s/\n/\`,\`/;ba}')\`)")"
 
   # Wait for completion
-  until [ `/opt/couchbase/bin/cbq -e $QUERY_HOST -q=true -s="SELECT COUNT(*) as unbuilt FROM system:indexes WHERE keyspace_id = '$i' AND state &lt;&gt; 'online'" | sed -n -e '/{/,$p' | jq -r '.results[].unbuilt'` -eq 0 ];
+  until [ `/opt/couchbase/bin/cbq -e $QUERY_HOST -u $USERNAME -p $PASSWORD -q=true -s="SELECT COUNT(*) as unbuilt FROM system:indexes WHERE keyspace_id = '$i' AND state <> 'online'" | sed -n -e '/{/,$p' | jq -r '.results[].unbuilt'` -eq 0 ];
   do
     sleep 5
   done
@@ -56,3 +58,5 @@ sudo apt-get install -y jq
 The script isn't pretty, but it gets the job done. Hopefully N1QL will get a wildcard BUILD INDEX command in the future.
 
 **Note:** Revised 9/15/2016 to better strip header information from the query output before the JSON object. Previously it only stripped the first line, now it strips all lines until it encounters the curly brace starting the JSON result.
+
+**Note:** Revised 10/24/2018 to support RBAC authentication for Couchbase Server 5.0, corrected a typo from the blog conversion, and support buckets with symbols requiring escaping (i.e. 'beer-sample').
