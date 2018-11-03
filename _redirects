@@ -1,0 +1,2 @@
+# Redirect default Netlify subdomain to primary domain
+https://nifty-chandrasekhar-d6298e.netlify.com/* https://btburnett.com/:splat 301!
