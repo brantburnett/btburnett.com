@@ -41,6 +41,7 @@ plugins:
   - jekyll-sitemap
 include:
   - _pages
+  - _redirects
 feed:
   path: feed
 bing_site_verification: "856310D5D9F598FB14D8276ED043C3F0"
