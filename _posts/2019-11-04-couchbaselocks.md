@@ -57,4 +57,4 @@ Using an memcached bucket for locks, or ephemeral for Couchbase Server Enterpris
 
 For C# developers, there is now a standard package which delivers simple and lightweight distributed mutexes via a Couchbase cluster. I'm hopeful that that developers using other languages, such as Node or Go, may make similar packages using the same document schema. This would allow locks to be shared between any microservice in an application, regardless of language.
 
-Please feel free to [file GitHub issues](https://github.com/couchbaselabs/Couchbase.Extensions/issues)
+Please feel free to [file GitHub issues](https://github.com/couchbaselabs/Couchbase.Extensions/issues) if you find any bugs or have suggestions, and let me know on [Twitter](https://twitter.com/btburnett3) if you like it! We'll probably roll an official release after we've collected some feedback and fixed any issues.
