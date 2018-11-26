@@ -18,7 +18,7 @@ Below I share some of the steps I found that helped along the way. I won't cover
 
     ```powershell
     choco install -y kubernetes-cli
-    choco install -y aws-cli
+    choco install -y awscli
     ```
 
 2. Configure AWS CLI with your credentials
