@@ -5,3 +5,11 @@
 <link rel="mask-icon" href="/assets/images/safari-pinned-tab.svg" color="#5bbad5">
 <meta name="msapplication-TileColor" content="#da532c">
 <meta name="theme-color" content="#ffffff">
+<meta name="twitter:card" content="summary">
+<meta name="og:type" content="article">
+<meta name="og:image" content="{{site.url}}{{ site.author.avatar }}">
+<meta name="og:title" content="{{ page.title }}">
+<meta name="twitter:creator:id" content="btburnett3">
+{% if page.summary %}
+<meta name="og:description" content="{{ page.summary }}">
+{% endif %}

@@ -6,6 +6,7 @@ categories:
   - Couchbase
   - Microservices
   - REST
+summary: A practical C# implementation of a REST API long-running job pattern for a distributed microservice architecture.
 ---
 {: .notice--info}
 This blog is one of The December 6th entries on the [2018 C# Advent Calendar](https://crosscuttingconcerns.com/The-Second-Annual-C-Advent). Thanks for having me again Matt!
