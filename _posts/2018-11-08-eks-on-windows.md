@@ -29,9 +29,9 @@ Below I share some of the steps I found that helped along the way. I won't cover
 
 ## Setting Up AWS IAM Authenticator
 
-When using EKS, kubectl must be configured to use the [https://github.com/kubernetes-sigs/aws-iam-authenticator](AWS IAM Authenticator). This lightweight utility is called by kubectl to get authentication tokens, and uses your credentials configured for the AWS CLI. It can support IAM roles and multiple profiles, but for this example I'll keep it simple and assume we're using the default profile configured via `aws configure`.
+When using EKS, kubectl must be configured to use the [AWS IAM Authenticator](https://github.com/kubernetes-sigs/aws-iam-authenticator). This lightweight utility is called by kubectl to get authentication tokens, and uses your credentials configured for the AWS CLI. It can support IAM roles and multiple profiles, but for this example I'll keep it simple and assume we're using the default profile configured via `aws configure`.
 
-1. Download the authenticator. The current URL for Windows is https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/windows/amd64/aws-iam-authenticator.exe, but you may want to find the up-to-date version [here](https://docs.aws.amazon.com/eks/latest/userguide/configure-kubectl.html).
+1. Download the authenticator. The current URL for Windows is https://amazon-eks.s3-us-west-2.amazonaws.com/1.11.5/2018-12-06/bin/windows/amd64/aws-iam-authenticator.exe, but you may want to find the up-to-date version [here](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html).
 2. Place aws-iam-authenticator.exe somewhere in your system path. For example, I was lazy and put it in C:\ProgramData\Chocolatey\bin.
 3. Right-click on aws-iam-authenticator.exe, select Properties, and Unblock the file so it can be executed.
 4. Confirm that the command is working from a new shell window:
@@ -39,6 +39,27 @@ When using EKS, kubectl must be configured to use the [https://github.com/kubern
     ```powershell
     aws-iam-authenticator --help
     ```
+    
+**Update**: I updated some of the links above, and here is a script to download aws-iam-authenticator and add it to your path:
+
+```powershell
+$installDir = "${env:LOCALAPPDATA}\aws-iam-authenticator"
+$version = "1.11.5/2018-12-06"
+ 
+New-Item -ItemType Directory $installDir -ErrorAction SilentlyContinue
+ 
+Invoke-WebRequest -OutFile $installDir\aws-iam-authenticator.exe -UseBasicParsing "https://amazon-eks.s3-us-west-2.amazonaws.com/$version/bin/windows/amd64/aws-iam-authenticator.exe"
+ 
+Unblock-File $installDir\aws-iam-authenticator.exe
+ 
+$path = [Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::User) -split ";"
+if ($path -inotcontains $installDir) {
+  $path += $installDir
+  [Environment]::SetEnvironmentVariable("PATH", $path -join ";", [EnvironmentVariableTarget]::User)
+ 
+  $env:PATH = (([Environment]::GetEnvironmentVariable("PATH", [EnvironmentVariableTarget]::Machine) -split ";") + $path) -join ";"
+}
+```
 
 ## Adding Your Cluster To Your Kubernetes Config
 
