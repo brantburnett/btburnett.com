@@ -1,7 +1,7 @@
 ---
 id: 311
 title: IAsyncEnumerable<T> Is Your Friend, Even In .NET Core 2.x
-date: 2019-12-01T06:00:00-05:00
+date: 2019-11-27T06:00:00-05:00
 categories:
   - .NET Core
   - C#
