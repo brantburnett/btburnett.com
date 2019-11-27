@@ -2,11 +2,15 @@
 id: 311
 title: IAsyncEnumerable<T> Is Your Friend, Even In .NET Core 2.x
 date: 2019-11-27T06:00:00-05:00
+permalink: /csharp/2019/12/01/iasyncenumerable-is-your-friend.html
 categories:
-  - .NET Core
   - C#
+  - .NET Core
 summary: IAsyncEnumerable is a great new feature in C# 8. This post should help clarify what they do, when to use them, and when they can be used in a particular project.
 ---
+{: .notice--info}
+This blog is one of The December 1st entries on the [2019 C# Advent Calendar](https://crosscuttingconcerns.com/The-Third-Annual-csharp-Advent). Thanks for having me again Matt!
+
 My favorite new feature found in [C# 8](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8) has got to be
 [Asynchronous Streams](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams), a.k.a.
 Asynchronous Enumerables. However, I think there may some confusion as to what they do, when to use them, and even **if**
