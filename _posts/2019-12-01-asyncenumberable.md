@@ -3,6 +3,7 @@ id: 311
 title: IAsyncEnumerable<T> Is Your Friend, Even In .NET Core 2.x
 date: 2019-12-01T06:00:00-05:00
 categories:
+  - .NET Core
   - C#
 summary: IAsyncEnumerable is a great new feature in C# 8. This post should help clarify what they do, when to use them, and when they can be used in a particular project.
 ---
