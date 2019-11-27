@@ -1,7 +1,7 @@
 ---
 id: 311
 title: IAsyncEnumerable<T> Is Your Friend, Even In .NET Core 2.x
-date: 2019-11-27T06:00:00-05:00
+date: 2019-12-01T06:00:00-05:00
 permalink: /csharp/2019/12/01/iasyncenumerable-is-your-friend.html
 categories:
   - C#
@@ -11,22 +11,23 @@ summary: IAsyncEnumerable is a great new feature in C# 8. This post should help 
 {: .notice--info}
 This blog is one of The December 1st entries on the [2019 C# Advent Calendar](https://crosscuttingconcerns.com/The-Third-Annual-csharp-Advent). Thanks for having me again Matt!
 
-My favorite new feature found in [C# 8](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8) has got to be
+My favorite new feature in [C# 8](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8) has got to be
 [Asynchronous Streams](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams), a.k.a.
 Asynchronous Enumerables. However, I think there may some confusion as to what they do, when to use them, and even **if**
 they can be used in a particular project. This post will hopefully clarify some of these points.
 
 ## TL;DR
 
-You can use `IAsyncEnumable<T>` and the related C# 8 features in .Net Core 2.x or .NET Framework 4.6.1.
+You can use `IAsyncEnumerable<T>` and the related C# 8 features in .Net Core 2.x or .NET Framework 4.6.1, not just .NET Core 3.0!
 
 ## Why use `IAsyncEnumerable<T>`?`
 
 When writing efficient applications intended to handle large numbers of simultaneous operations, such as web applications,
 blocking operations are the enemy. Any time an application is waiting on some kind of I/O-bound operation, such as a network
 response or a hard disk read, it is always best to relinquish the thread back to the thread pool. This allows the CPU to
-work on other operations while the method is waiting, and then continue the work once there is more to be done. Lots of details
-about why are [available here](https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/task-based-asynchronous-programming).
+work on other operations while the method is waiting, and then continue the work once there is more to be done, without using up
+all of the threads in the thread pool. Lots of details about why are
+[available here](https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/task-based-asynchronous-programming).
 
 In many cases, it's efficient enough to simply return a regular `IEnumerable<T>` asynchronously, like so:
 
@@ -55,17 +56,17 @@ such as `ExecuteAsync` to return early and then wait for more data as it is iter
 
 ## When **Not** To Use IAsyncEnumerable
 
-Don't use `IAsyncEnumerablt<T>` for any collection which is inherently synchronous and CPU-bound.
+Don't use `IAsyncEnumerable<T>` for any collection which is inherently synchronous and CPU-bound.
 For those cases, continuing using `IEnumerable<T>`. The extra overhead of handling asynchronous tasks
-will actually be less performant in these scenarios.
+will usually be less performant in these scenarios.
 
-Knowing which to use on a interface, which can have different backing implementations which may or may not be
-synchronous, is a bit trickier. In this case, use the pattern for the most likely scenario. If in doubt, lean
-towards `IAsyncEnumerable<T>` because it can be used for either scenario and is therefore more flexible.
+Knowing which type to use as the return type on an nterface method is a bit tricker. The interface can have different
+backing implementations which may or may not be synchronous. In this case, use the pattern for the most likely scenario.
+If in doubt, lean towards `IAsyncEnumerable<T>` because it can be used for either scenario and is therefore more flexible.
 
 ## Returning an IAsyncEnumerable in C# 8
 
-For simple use cases, returning an `IAsyncEnumerable<T>` is as easy as an `IEnumerable<T>`, using an iterator function.
+For simple use cases, returning an `IAsyncEnumerable<T>` using an iterator function is as easy as an `IEnumerable<T>`.
 
 ```cs
 public async IAsyncEnumerable<XYZ> GetXYZAsync() {
@@ -80,7 +81,7 @@ public async IAsyncEnumerable<XYZ> GetXYZAsync() {
 
 It is also possible to write an iterator method which returns `IAsyncEnumerator<T>`.
 
-If the method should to support cancellation, the CancellationToken needs to be decorated with the
+If the method supports cancellation, the CancellationToken should to be decorated with the
 `EnumeratorCancellation` attribute:
 
 ```cs
@@ -96,7 +97,7 @@ public async IAsyncEnumerable<XYZ> GetXYZAsync([EnumeratorCancellation] Cancella
 
 ## Consuming an IAsyncEnumerable in C# 8
 
-To consume the IAsyncEnumerable, simply use the new `await foreach` statement within an asynchronous method.
+To consume an IAsyncEnumerable, simply use the new `await foreach` statement within an asynchronous method.
 
 ```cs
 await foreach (var item in GetXYZAsync())
@@ -105,7 +106,7 @@ await foreach (var item in GetXYZAsync())
 }
 ```
 
-To control the synchronization context, `ConfigureAwait` is available just like on `Task`.
+To control the synchronization context, `ConfigureAwait` is available, just like on `Task`.
 
 ```cs
 await foreach (var item in GetXYZAsync().ConfigureAwait(false))
@@ -214,7 +215,7 @@ asynchronous streams. The good news is that there is a relatively easy path.
 ```
 
 However, this approach has problems if the package needs to target versions of .NET Core before 2.0, .NET Standard before 2.0,
-or .NET Framework before 4.6.1. The Microsoft.Bcl.AsyncInterfaces package isn't compatible with frameworks prior these versions.
+or .NET Framework before 4.6.1. The `Microsoft.Bcl.AsyncInterfaces` package isn't compatible with frameworks prior these versions.
 This can still be addressed by using preprocessor conditionals within the codebase to exclude `IAsyncEnumerable<T>` support,
 but is much more cumbersome and outside the scope of this post.
 
