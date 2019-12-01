@@ -13,12 +13,12 @@ This blog is one of The December 1st entries on the [2019 C# Advent Calendar](ht
 
 My favorite new feature in [C# 8](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8) has got to be
 [Asynchronous Streams](https://docs.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-8#asynchronous-streams), a.k.a.
-Asynchronous Enumerables. However, I think there may some confusion as to what they do, when to use them, and even **if**
+Asynchronous Enumerables. However, I think there may some confusion as to what they do, when to use them, and even if
 they can be used in a particular project. This post will hopefully clarify some of these points.
 
 ## TL;DR
 
-You can use `IAsyncEnumerable<T>` and the related C# 8 features in .Net Core 2.x or .NET Framework 4.6.1, not just .NET Core 3.0!
+You can use `IAsyncEnumerable<T>` and the related C# 8 features in .NET Core 2.x or .NET Framework 4.6.1, not just .NET Core 3.0!
 
 ## Why use `IAsyncEnumerable<T>`?`
 
@@ -36,7 +36,7 @@ public async Task DoWork()
 {
     var query = BuildMyQuery();
 
-    var queryResult = await query.ExecuteAsync();
+    IEnumerable<XYZ> queryResult = await query.ExecuteAsync();
 
     foreach (var item in queryResult)
     {
@@ -45,11 +45,11 @@ public async Task DoWork()
 }
 ```
 
-However, this is may not be the most effective approach. There are two potential limitations, depending on the backing implementation of
+However, this is may not be the most efficient approach. There are two potential limitations, depending on the backing implementation of
 `ExecuteAsync` in the example above.
 
-1. The implementation of ExecuteAsync may return after it gets the first part of the data, or even none. Then, as it is enumerated it may block waiting for more items to arrive.
-2. The implementation of ExecuteAsync may wait until it has **all** of the data before returning, delaying the point where DoWork may begin processing the data.
+1. The implementation of ExecuteAsync may return after it gets the first part of the data, or even none. If it is enumerated faster than the data is arriving it will block waiting for more items to arrive. This will block the executing thread.
+2. The implementation of ExecuteAsync may wait until it has **all** of the data before returning. This delays the point where DoWork may begin processing data.
 
 `IAsyncEnumerable<T>` and its sibling `IAsyncEnumerator<T>`, on the other hand, return a `Task` as the stream is iterated. This allows methods
 such as `ExecuteAsync` to return early and then wait for more data as it is iterated, without blocking the thread.
@@ -60,7 +60,7 @@ Don't use `IAsyncEnumerable<T>` for any collection which is inherently synchrono
 For those cases, continuing using `IEnumerable<T>`. The extra overhead of handling asynchronous tasks
 will usually be less performant in these scenarios.
 
-Knowing which type to use as the return type on an nterface method is a bit tricker. The interface can have different
+Knowing which type to use as the return type on an interface method is a bit tricker. The interface can have different
 backing implementations which may or may not be synchronous. In this case, use the pattern for the most likely scenario.
 If in doubt, lean towards `IAsyncEnumerable<T>` because it can be used for either scenario and is therefore more flexible.
 
@@ -115,7 +115,7 @@ await foreach (var item in GetXYZAsync().ConfigureAwait(false))
 }
 ```
 
-To support cancellation tokens:
+To pass a cancellation token:
 
 ```cs
 await foreach (var item in GetXYZAsync().WithCancellation(cancellationToken))
