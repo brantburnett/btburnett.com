@@ -141,7 +141,7 @@ However, producing and consuming IAsyncEnumerables is a bit more difficult. Here
 
 ```cs
 var enumerable = GetXYZAsync();
-var enumerator = await enumerable.GetAsyncEnumerator();
+var enumerator = enumerable.GetAsyncEnumerator();
 try
 {
     while (await enumerator.MoveNextAsync())
