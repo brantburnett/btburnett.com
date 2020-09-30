@@ -55,10 +55,6 @@ locale: en-US
 paginate: 5
 atom_feed:
   path: /feed
-analytics:
-  provider: google-gtag
-  google:
-    tracking_id: "UA-3959447-1"
 comments:
   provider: disqus
   disqus:
