@@ -56,7 +56,7 @@ paginate: 5
 atom_feed:
   path: /feed
 analytics:
-  provider: google-universal
+  provider: google-gtag
   google:
     tracking_id: "UA-3959447-1"
 comments:
