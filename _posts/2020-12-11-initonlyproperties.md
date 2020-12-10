@@ -112,7 +112,7 @@ later. These are the versions that include the C# 9 compiler.
 
 The key to init-only properties is the `IsExternalInit` class, which is basically nothing but a placeholder (somewhat like
 an empty attribute) that is applied to the `void` return type of the setter. This type is defined as part of .NET 5, but
-if you're not targetting .NET 5 then it's not available for the compiler to reference.
+if you're not targeting .NET 5 then it's not available for the compiler to reference.
 
 ```text
 CS0518 Predefined type 'System.Runtime.CompilerServices.IsExternalInit' is not defined or imported
