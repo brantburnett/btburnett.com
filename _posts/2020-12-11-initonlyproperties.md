@@ -21,7 +21,7 @@ packages targeting .NET Standard or other versions of .NET?
 ## TL;DR
 
 For internal projects and/or types, you can safely use records and init only setters to target any modern version of .NET. I've tested
-.NET 4.8, .NET Core 2.1, and .NET Core 3.1. However, for any public members exposed via NuGet pacakges there are **lots** of caveats.
+.NET 4.8, .NET Core 2.1, and .NET Core 3.1. However, for any public members exposed via NuGet packages there are **lots** of caveats.
 
 Note: Most of the other C# 9 features are fine to use, regardless of target frameworks or consumer C# versions:
 
