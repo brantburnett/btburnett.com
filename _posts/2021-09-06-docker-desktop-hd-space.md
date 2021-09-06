@@ -29,7 +29,7 @@ docker ps -q | % { docker stop $_ }
 docker ps -aq | % { docker rm $_ }
 
 # Delete all container images. This may return a few errors but that is usually fine.
-docker images --format "{{.Repository}}:{{.Tag}}" | % { docker rmi $_ }
+docker images --format "\{{.Repository}}:\{{.Tag}}" | % { docker rmi $_ }
 ```
 
 Once this is done, further commands will do more cleanup:
