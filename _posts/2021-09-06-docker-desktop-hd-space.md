@@ -23,13 +23,15 @@ the biggest culprit in most cases. Also, in general it is safe to delete contain
 Since we're talking primarily about Windows, these examples are in Powershell. However, the general concept should work from Bash as well.
 
 ```powershell
+{% raw %}
 # Delete all containers (if acceptable). This allows the images they are referencing to be deleted,
 # but is not required. The first command ensures that all containers are stopped.
 docker ps -q | % { docker stop $_ }
 docker ps -aq | % { docker rm $_ }
 
 # Delete all container images. This may return a few errors but that is usually fine.
-docker images --format "\{{.Repository}}:\{{.Tag}}" | % { docker rmi $_ }
+docker images --format "{{.Repository}}:{{.Tag}}" | % { docker rmi $_ }
+{% endraw %}
 ```
 
 Once this is done, further commands will do more cleanup:
