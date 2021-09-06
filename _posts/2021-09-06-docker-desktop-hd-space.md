@@ -23,8 +23,8 @@ the biggest culprit in most cases. Also, in general it is safe to delete contain
 Since we're talking primarily about Windows, these examples are in Powershell. However, the general concept should work from Bash as well.
 
 ```powershell
-# Delete all containers (if acceptable). This allows the images they are referencing to be deleted, but is not required.
-# The first command ensures that all containers are stopped.
+# Delete all containers (if acceptable). This allows the images they are referencing to be deleted,
+# but is not required. The first command ensures that all containers are stopped.
 docker ps -q | % { docker stop $_ }
 docker ps -aq | % { docker rm $_ }
 
@@ -78,7 +78,7 @@ Optimize-VHD -Path ${env:LOCALAPPDATA}\Docker\wsl\data\ext4.vhdx -Mode Full
 ### Side note
 
 If you're running antivirus, be sure you've excluded VHDX files from real time scans for better performance
-within Docker. (https://docs.microsoft.com/en-us/troubleshoot/windows-server/virtualization/antivirus-exclusions-for-hyper-v-hosts)
+within Docker. See [Recommended antivirus exclusions for Hyper-V hosts](https://docs.microsoft.com/en-us/troubleshoot/windows-server/virtualization/antivirus-exclusions-for-hyper-v-hosts) for details.
 
 ## Conclusion
 
