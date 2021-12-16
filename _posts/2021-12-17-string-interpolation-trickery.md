@@ -11,15 +11,15 @@ summary: The .NET and C# teams have given as a great new performance tool with i
 {: .notice--info}
 This blog is one of The December 17th entries on the [2021 C# Advent Calendar](https://www.csadvent.christmas/). Thanks for having me again Matt!
 
-Recently, every November we've gotten a new version of C# paired with a new version of .NET. And, every year this new version is packed with
+For the last few years we've gotten a new version of C# paired with a new version of .NET each November. And every year this new version is packed with
 great new features. For me, one of the coolest features is [interpolated string handlers](https://devblogs.microsoft.com/dotnet/string-interpolation-in-c-10-and-net-6/).
 
 Interpolated string handlers are primarily designed to provide a performance boost building strings. But is there more to them than meets the eye?
-I believe that they lay the groundwork doing much more than just building strings faster.
+I believe that they lay the groundwork for doing much more than just building strings faster.
 
 ## Interpolated String Handler Overview
 
-First, let's start with an overview of how interpolated string handlers work. For a more in depth look, see the
+First, let's start with an overview of how interpolated string handlers work. For a more in-depth look, see the
 [blog post from Stephen Toub](https://devblogs.microsoft.com/dotnet/string-interpolation-in-c-10-and-net-6/).
 
 When using C# 9, interpolating a string is optimized by the compiler in a variety of ways. However, in many cases
@@ -27,7 +27,7 @@ the optimizations aren't an option, and a call to `string.Format(...)` is used. 
 such as interpreting the format string every call, potentially allocating an `object[]` on the heap, boxing value types,
 and generating temporary intermediate strings.
 
-For projects targeting .NET 6, even upgrading existing projects, string interpolations get an immediate performance
+For projects targeting .NET 6, even upgrading existing projects, string interpolation gets an immediate performance
 boost because they will use the [DefaultInterpolatedStringHandler](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.defaultinterpolatedstringhandler?view=net-6.0)
 to build strings. This structure has a much better performance profile overall than `string.Format`.
 
@@ -112,15 +112,15 @@ The answer is "Only the literal segments are strings." Of course, `Debug.Assert`
 It can do whatever it likes with the handler. Additionally, the implication of `AppendFormatted` is that it will format `count`
 as a string and append it. But in reality it may do whatever it likes.
 
-Therefore, if we can imagine a "thing" which is built up of string literals and variable values presented in order, then
+Therefore, if we can imagine a "thing" which is built up of string literals and expressions presented in order, then
 we can build it using an interpolated string. Even if what we're creating isn't a string at all.
 
 ## An Example: Parameterized SQL Queries
 
 Have you ever needed to build a parameterized SQL query? Or [N1QL Query](https://www.couchbase.com/products/n1ql) if you're
-a [Couchbase](https://www.couchbase.com/) user? It's very important to parameterize to help avoid injection attacks,
-so the answer for most database users should be yes. Even if you use an ODM or ORM, it's often necessary to hand write queries
-for special cases.
+a [Couchbase](https://www.couchbase.com/) user? It's very important to parameterize user input to prevent injection attacks,
+so the answer for most database users should be yes. Even if you use an ODM or ORM like Entity Framework it's often necessary
+to hand-write queries for special cases.
 
 Building a parameterized query can be a pain. Take this relatively simple example for `SqlCommand`:
 
@@ -135,7 +135,23 @@ public async Task<string> GetOptionValue(int optionSet, string optionName)
 }
 ```
 
-What if this could be written instead as follows, but still retained all the security of parameterized queries:
+If you hate the duplication involved in the parameter names, you may even pull those out to constants, which is even more convoluted.
+
+```cs
+private const string OptionSetParamName = "@OptionSet";
+private const string OptionNameParamName = "@OptionName";
+
+public async Task<string> GetOptionValue(int optionSet, string optionName)
+{
+    await using var cmd = new SqlCommand($"SELECT OptionValue FROM Options WHERE OptionSet = {OptionSetParamName} AND OptionName = {OptionNameParamName}", _connection);
+    cmd.Parameters.Add(OptionSetParamName, SqlDbType.Int).Value = optionSet;
+    cmd.Parameters.Add(OptionNameParamName, SqlDbType.NVarChar).Value = optionName;
+
+    return (await cmd.ExecuteScalarAsync()).ToString();
+}
+```
+
+What if this could be written instead as follows, but still retained all the security of parameterized queries?
 
 ```cs
 public async Task<string> GetOptionValue(int optionSet, string optionName)
@@ -158,7 +174,8 @@ This example gets somewhat complicated, so I've tried to annotate it throughout 
 // However, this example requires "ref struct" because it includes a DefaultInterpolatedStringHandler in its fields.
 public ref struct SqlCommandInterpolatedStringHandler
 {
-    // We'll use DefaultInterpolatedStringHandler to build the query string, it'll be more performant than reinventing the wheel.
+    // Internally we'll use DefaultInterpolatedStringHandler to build the query string.
+    // This be more performant than reinventing the wheel.
     private DefaultInterpolatedStringHandler _innerHandler;
 
     // This will maintain a list of parameters as we build the query string
@@ -169,7 +186,7 @@ public ref struct SqlCommandInterpolatedStringHandler
 
     public SqlCommandInterpolatedStringHandler(int literalLength, int formattedCount)
     {
-        // Construct the inner handler, forwarding the same helper information
+        // Construct the inner handler, forwarding the same hints
         _innerHandler = new DefaultInterpolatedStringHandler(literalLength, formattedCount);
 
         // Build an empty list of parameters with the capacity we'll need
@@ -213,7 +230,7 @@ public ref struct SqlCommandInterpolatedStringHandler
     }
 
     // There are a lot of AppendFormatted overloads we're required to implement
-    // We could also use alignment and format parameters for our own purposes, here we ignore them
+    // We could use alignment and format parameters for our own purposes, here we ignore them
 
     public void AppendFormatted<T>(T value, string? format) =>
         AppendFormatted(value);
@@ -291,17 +308,22 @@ SELECT OptionValue FROM Options WHERE OptionSet = @Param0 AND OptionName = @Para
 It's that easy! Okay, maybe not quite easy, but still very powerful. Of course, there's also a
 lot of room for improvement on this quick example.
 
-- The parameters array could come from the array pool, though I'd want to measure that with benchmarks to be sure it's advantageous
+- The parameter array could come from the array pool, though I'd want to measure that with benchmarks to be sure it's advantageous
 - An overload that takes a stack-allocated `Span<SqlParameter>` (probably overkill given all the other heap allocations and boxing related to `SqlParameter`)
 - A pre-built, static set of parameter names for reuse
 - Support for more parameter types
 - Using format strings to specify parameter types, i.e. varchar vs nvarchar
-- An overload to create and execute the command rather than just create it, or perhaps create and prepare
+- Another static method to create and execute the command rather than just create it
 - And probably much more I haven't considered
 
-## Other Ideas
+## Other Random Ideas
 
-### Other Idea #1: JSON Building Without POCOs
+Here are a few random ideas. Some of these ideas are probably be silly in practice. I'm hoping they'll get everyone's
+creative juices flowing.
+
+Please, don't write back telling me how dumb the ideas are :). If you have any other ideas, I'd love to see them in the comments!
+
+### Random Idea #1: JSON Building Without POCOs
 
 This idea is interesting, but the double curly braces get a bit gnarly. Also, in most cases you probably
 want a POCO, but I can see simple scenarios where POCOs are overkill. This example also assumes that the literals
@@ -317,12 +339,12 @@ public string GetPersonJson(string name, int age, IEnumerable<Child> children)
 }
 ```
 
-### Other Idea #2: Safely Building HTML
+### Random Idea #2: Safely Building HTML
 
 In most cases, we build HTML in Razor views or pages. However, sometimes we need to build HTML in code.
 This can be done with a TagBuilder, but that can feel unwieldy. Building a string that just applies
 appropriate escaping would be nice. It could even use a TagBuilder under the hood. Though it probably wouldn't
-be quite as performant given that the literals may need parsing.
+be quite as performant given that the literals would need parsing.
 
 ```cs
 public IHtmlContent CreateParagraph(string content, string class)
@@ -333,7 +355,7 @@ public IHtmlContent CreateParagraph(string content, string class)
 }
 ```
 
-### Other Idea #3: Hash Codes
+### Random Other Idea #3: Hash Codes
 
 This is an example that doesn't involve strings at all. When overriding `object.Equals(object other)` its generally accepted that
 you should also override `object.GetHashCode()`. However, calculating a hash code for your object may be cumbersome, especially
@@ -357,8 +379,9 @@ What if we had this syntax:
 
 ```cs
 // In theory, if AppendLiteral is an inlined no-op JIT should optimize away the call
-// This would drop any literal segments, such as whitespace, without perf penalty
-// Just a theory, I haven't tested it
+// This would drop any literal segments, such as whitespace, without perf penalty.
+// Just a theory, I haven't tested it.
+// Also, note the use of "i" as a format string, which in this case indicates case-insensitive comparison.
 public override int GetHashCode() => HashCodeInterpolated.Calculate($"{fieldA} {fieldB} {fieldC:i}");
 ```
 
@@ -366,6 +389,3 @@ public override int GetHashCode() => HashCodeInterpolated.Calculate($"{fieldA} {
 
 In conclusion, I think the .NET community, especially library developers, should embrace the idea that interpolated string handlers
 can be valuable for much more than just boosting string building performance. They open up a wide range of exciting new possibilities.
-
-Some of my ideas may be silly in practice. I just wanted to get your creative juices flowing. If you have any other ideas,
-I'd love to see them in the comments!
