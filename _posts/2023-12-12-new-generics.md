@@ -6,7 +6,7 @@ permalink: /csharp/2023/12/12/generic-type-construction-with-static-virtual-inte
 categories:
   - C#
   - .NET
-summary: One day I asked myself "Hey, I wonder if I can use Roslyn to make an even better, faster OpenAPI SDK generator?"
+summary: "I'd like to demonstrate a different use case for static virtual interface members: generic type construction."
 ---
 {: .notice--info}
 This blog is one of The December 12th entries on the [2023 C# Advent Calendar](https://www.csadvent.christmas/). Thanks for having me again!
@@ -14,16 +14,15 @@ This blog is one of The December 12th entries on the [2023 C# Advent Calendar](h
 Typically for C# Advent I write about a new C# feature. And there are a lot of great new features this year in
 [C# 12](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12). My favorite is probably
 [primary constructors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#primary-constructors) because of the
-massive amount of boilerplate it removes from my code when I write services that accept injected dependencies. And my love
-of high performance code is also super excited by the hidden optimizations found in
-[collection expressions](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#collection-expressions).
+massive amount of boilerplate it replaces when I write classes that accept injected dependencies. And I'm also super excited by the hidden
+performance optimizations found in [collection expressions](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#collection-expressions).
 
-But, oddly, this year I'm going to talk about a new feature from last year in .NET 7. The [generic math](https://learn.microsoft.com/en-us/dotnet/standard/generics/math)
-support that was added in .NET 7 is a great new feature by itself, but what's even more interesting to me is how it was implemented.
-Under the hood, generic math support uses a new feature in C# 11 called [static virtual interface members](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-11.0/static-virtual-interface-members).
+But, oddly, this year I'm going to talk about a new feature from last year. [Generic math](https://learn.microsoft.com/en-us/dotnet/standard/generics/math)
+support was added in .NET 7 and is a great new feature by itself, but what's even more interesting to me is how it was implemented.
+Under the hood, generic math support uses a new feature in C# 11 called [static virtual interface members](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/static-virtual-interface-members).
 
-Station virtual interface members isn't a purely C# 11 feature. Utilizing them requires .NET 7 or later because backing
-support was already required in the runtime. Since .NET 7 wasn't a long-term support release I don't think it's gotten
+Static virtual interface members isn't a purely C# 11 feature. Utilizing them requires .NET 7 or later because changes
+were also required in the .NET runtime. Since .NET 7 wasn't a long-term support release I don't think it's gotten
 as much utilization as it deserves.
 
 Today, I'd like to demonstrate a different use case for static virtual interface members: generic type construction.
@@ -32,7 +31,7 @@ Today, I'd like to demonstrate a different use case for static virtual interface
 
 Since .NET 2.0 we've had support for generics in C#. Generics are a great way to write code that can be reused across
 a variety of types. For example, the `List<T>` class is a generic type which can be used to store a list of any type
-while maintaining strong type controls and avoiding boxing/unboxing of value types.
+while maintaining strong type controls and avoiding boxing of value types (unlike its predecessor `ArrayList`).
 
 Along with generics came the concept of [generic type constraints](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/constraints-on-type-parameters).
 These allow you to specify that a generic type must be a particular type or implement a particular interface. Since
@@ -63,6 +62,8 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 {
     foreach (var model in models)
     {
+        // Constructs T, either a Car or Motorcycle, depending on the
+        // generic type parameter used when calling Create<T>
         yield return new T() { Model = model };
     }
 }
@@ -71,10 +72,10 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 ## The Problem
 
 This works great for simple cases, but what if we wanted to accept parameters on the constructor?
-Perhaps we want to make the `Model` property read only and require it to be passed in on the constructor.
+Perhaps we want to make the `Model` property read only and require it to be passed during construction.
 
 {: .notice--info}
-Note: I'm using C# 12 [primary constructors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#primary-constructors) here!
+**Note:** I'm using C# 12 [primary constructors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#primary-constructors) here!
 
 ```cs
 public abstract class Automobile(string model)
@@ -106,7 +107,7 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 
 This is where static virtual interface members come in. With static virtual interface members, we can define a static
 method on an interface that can be called from within the generic code. And, in many ways, a constructor is really a special
-kind of static method. The differences between a constructor versus a static method that returns a new instance of `T`
+kind of static method. The differences between a constructor versus a static factory method that returns a new instance of `T`
 are minor. So, let's see how we can use static virtual interface members to solve our problem.
 
 ```csharp
@@ -124,7 +125,7 @@ public abstract class Automobile(string model)
     public string Model { get; } = model;
 }
 
-// IAutomobileFactory<T> is included with a self-referencing generic type parameter
+// IAutomobileFactory<Car> is included with a self-referencing generic type parameter
 public class Car(string model) : Automobile(model), IAutomobileFactory<Car>
 {
     // The create method is implemented as a static method on the class,
@@ -132,6 +133,7 @@ public class Car(string model) : Automobile(model), IAutomobileFactory<Car>
     public static Car Create(string model) => new Car(model);
 }
 
+// Repeat for Motorcycle
 public class Motorcycle(string model) : Automobile(model), IAutomobileFactory<Motorcycle>
 {
     public static Motorcycle Create(string model) => new Motorcycle(model);
@@ -140,7 +142,7 @@ public class Motorcycle(string model) : Automobile(model), IAutomobileFactory<Mo
 // This method may be called with either Car or Motorcycle to create
 // a concrete instance of an Automobile.
 public IEnumerable<T> Create<T>(IEnumerable<string> models)
-    // Require that T implement IAutomobileFactory<T> to gain access to the static method
+    // Requires that T implement IAutomobileFactory<T> to gain access to the static method
     where T : Automobile, IAutomobileFactory<T>
 {
     foreach (var model in models)
@@ -151,11 +153,21 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 }
 ```
 
-## Limitations
+## Other Uses
 
-The main limitation of this approach is that you must be in control of the types of T. A class from a third-party library may implement the required static factory method, but if it isn't marked with the `IAutomobileFactory<T>` interface then you won't be able to use it. This is unlike the `new()` constraint which can be used with any type that has a public parameterless constructor.
-
-The other limitation is that static virtual interface members can only be used when targeting .NET 7 or later. This makes it unavailable for legacy applications and limits its effectiveness for libraries shared via NuGet that include older TFMs like .NET Standard 2.0.
+There are also many other use cases for static virtual interface members. For example, I intend to update [Yardarm](https://github.com/Centeredge/yardarm)
+to use them for execution order controls in enrichers: https://github.com/CenterEdge/Yardarm/blob/ac6c2dbc13d297cb768ce38f80dfe36426900807/src/main/Yardarm/Enrichment/IEnricher.cs#L10-L15. Currently consumers are required to instantiate the enrichers to get ordering information, but making it
+available statically makes more sense.
 
 ## Conclusion
 
+The main limitation of this approach is that you must be in control of the types of T. If `Car` and `Motorcycle`
+were implemented in a third-party library then you may not be able to mark them with the `IAutomobileFactory<T>` interface.
+Even if they implement the required static factory method, if it isn't marked with the interface then it won't work.
+This is unlike the `new()` constraint which can be used with any type that has a public parameterless constructor.
+
+The other limitation is static virtual interface members can only be used when targeting .NET 7 or later. This makes them unavailable
+for legacy applications. It also limits their effectiveness for libraries shared via NuGet that include older TFMs like `netstandard2.0`.
+
+However, when they're available to use, static virtual interface members can be a powerful tool for generic type construction that
+I feel is underutilized. I hope this post has helped you understand how to apply them to your code.
