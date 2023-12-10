@@ -42,23 +42,23 @@ One such constraint is the `new()` constraint. This requires that the type have 
 With this constraint, you can use the `new` keyword to construct an instance of the type. For example:
 
 ```cs
-public abstract class Automobile
+public abstract class Vehicle
 {
     public string Model { get; set; }
 }
 
-public class Car : Automobile
+public class Car : Vehicle
 {
 }
 
-public class Motorcycle : Automobile
+public class Motorcycle : Vehicle
 {
 }
 
 // This method may be called with either Car or Motorcycle to create
-// a concrete instance of an Automobile.
+// a concrete instance of an Vehicle.
 public IEnumerable<T> Create<T>(IEnumerable<string> models)
-    where T : Automobile, new()
+    where T : Vehicle, new()
 {
     foreach (var model in models)
     {
@@ -78,23 +78,23 @@ Perhaps we want to make the `Model` property read only and require it to be pass
 **Note:** I'm using C# 12 [primary constructors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#primary-constructors) here!
 
 ```cs
-public abstract class Automobile(string model)
+public abstract class Vehicle(string model)
 {
     public string Model { get; } = model;
 }
 
-public class Car(string model) : Automobile(model)
+public class Car(string model) : Vehicle(model)
 {
 }
 
-public class Motorcycle(string model) : Automobile(model)
+public class Motorcycle(string model) : Vehicle(model)
 {
 }
 
 // This method may be called with either Car or Motorcycle to create
-// a concrete instance of an Automobile.
+// a concrete instance of an Vehicle.
 public IEnumerable<T> Create<T>(IEnumerable<string> models)
-    where T : Automobile, new(string) // THIS IS NOT ALLOWED, COMPILER ERROR
+    where T : Vehicle, new(string) // THIS IS NOT ALLOWED, COMPILER ERROR
 {
     foreach (var model in models)
     {
@@ -112,23 +112,23 @@ are minor. So, let's see how we can use static virtual interface members to solv
 
 ```csharp
 // This interface defines a static abstract method, meaning that any class which implements
-// the interface must include a static method with the same signature. Note that generic T
+// the interface must include a static method with the same signature. Note that generic TSelf
 // allows the Create method to return a strongly-typed instance.
-public interface IAutomobileFactory<TSelf>
-    // Constrain the generic type parameter to types that self-reference using IAutomobileFactory<TSelf>.
-    // the Automobile constraint is optional in this example, but I like to include it for clarity.
-    where TSelf : Automobile, IAutomobileFactory<TSelf>
+public interface IVehicleFactory<TSelf>
+    // Constrain the generic type parameter to types that self-reference using IVehicleFactory<TSelf>.
+    // The Vehicle constraint is optional in this example, but I like to include it for clarity.
+    where TSelf : Vehicle, IVehicleFactory<TSelf>
 {
     static abstract TSelf Create(string model);
 }
 
-public abstract class Automobile(string model)
+public abstract class Vehicle(string model)
 {
     public string Model { get; } = model;
 }
 
-// IAutomobileFactory<Car> is included with a self-referencing generic type parameter
-public class Car(string model) : Automobile(model), IAutomobileFactory<Car>
+// IVehicleFactory<Car> is included with a self-referencing generic type parameter
+public class Car(string model) : Vehicle(model), IVehicleFactory<Car>
 {
     // The create method is implemented as a static method on the class,
     // using Car explicitly as the return type.
@@ -136,16 +136,16 @@ public class Car(string model) : Automobile(model), IAutomobileFactory<Car>
 }
 
 // Repeat for Motorcycle
-public class Motorcycle(string model) : Automobile(model), IAutomobileFactory<Motorcycle>
+public class Motorcycle(string model) : Vehicle(model), IVehicleFactory<Motorcycle>
 {
     public static Motorcycle Create(string model) => new Motorcycle(model);
 }
 
 // This method may be called with either Car or Motorcycle to create
-// a concrete instance of an Automobile.
+// a concrete instance of an Vehicle.
 public IEnumerable<T> Create<T>(IEnumerable<string> models)
-    // Requires that T implement IAutomobileFactory<T> to gain access to the static method
-    where T : Automobile, IAutomobileFactory<T>
+    // Requires that T implement IVehicleFactory<T> to gain access to the static method
+    where T : Vehicle, IVehicleFactory<T>
 {
     foreach (var model in models)
     {
@@ -157,8 +157,8 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 
 ## Conclusion
 
-The main limitation of this approach is that you must be in control of the types of `T`. If `Car` and `Motorcycle`
-were implemented in a third-party library then you may not be able to mark them with the `IAutomobileFactory<T>` interface.
+The main limitation of this approach is that you must be in control of the types of `TSelf`. If `Car` and `Motorcycle`
+were implemented in a third-party library then you may not be able to mark them with the `IVehicleFactory<TSelf>` interface.
 Even if they implement the required static factory method, if it isn't marked with the interface then it won't work.
 This is unlike the `new()` constraint which can be used with any type that has a public parameterless constructor.
 
