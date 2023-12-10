@@ -153,12 +153,6 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 }
 ```
 
-## Other Uses
-
-There are also many other use cases for static virtual interface members. For example, I intend to update [Yardarm](https://github.com/Centeredge/yardarm)
-to use them for execution order controls in enrichers: https://github.com/CenterEdge/Yardarm/blob/ac6c2dbc13d297cb768ce38f80dfe36426900807/src/main/Yardarm/Enrichment/IEnricher.cs#L10-L15. Currently consumers are required to instantiate the enrichers to get ordering information, but making it
-available statically makes more sense.
-
 ## Conclusion
 
 The main limitation of this approach is that you must be in control of the types of T. If `Car` and `Motorcycle`
