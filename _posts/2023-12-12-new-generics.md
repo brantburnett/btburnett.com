@@ -14,7 +14,7 @@ This blog is one of The December 12th entries on the [2023 C# Advent Calendar](h
 Typically for C# Advent I write about a new C# feature. And there are a lot of great new features this year in
 [C# 12](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12). My favorite is probably
 [primary constructors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#primary-constructors) because of the
-massive amount of boilerplate it replaces when I write classes that accept injected dependencies. And I'm also super excited by the hidden
+massive amount of boilerplate it replaces when writing classes that accept injected dependencies. I'm also super excited by the hidden
 performance optimizations found in [collection expressions](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-12#collection-expressions).
 
 But, oddly, this year I'm going to talk about a new feature from last year. [Generic math](https://learn.microsoft.com/en-us/dotnet/standard/generics/math)
@@ -23,14 +23,14 @@ Under the hood, generic math support uses a new feature in C# 11 called [static 
 
 Static virtual interface members isn't a purely C# 11 feature. Utilizing them requires .NET 7 or later because changes
 were also required in the .NET runtime. Since .NET 7 wasn't a long-term support release I don't think it's gotten
-as much utilization as it deserves.
+as much utilization as it deserves. But now .NET 8 is available and it is an LTS release, so I think it's worth revisiting.
 
 Today, I'd like to demonstrate a different use case for static virtual interface members: generic type construction.
 
 ## The Backstory
 
 Since .NET 2.0 we've had support for generics in C#. Generics are a great way to write code that can be reused across
-a variety of types. For example, the `List<T>` class is a generic type which can be used to store a list of any type
+a variety of types. For example, the `List<T>` class is a generic type which can be used to store a list of any distinct type
 while maintaining strong type controls and avoiding boxing of value types (unlike its predecessor `ArrayList`).
 
 Along with generics came the concept of [generic type constraints](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/constraints-on-type-parameters).
@@ -98,7 +98,7 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 {
     foreach (var model in models)
     {
-        yield return new T(model);
+        yield return new T(model); // THEREFORE, THIS IS NOT ALLOWED EITHER
     }
 }
 ```
@@ -114,10 +114,12 @@ are minor. So, let's see how we can use static virtual interface members to solv
 // This interface defines a static abstract method, meaning that any class which implements
 // the interface must include a static method with the same signature. Note that generic T
 // allows the Create method to return a strongly-typed instance.
-public interface IAutomobileFactory<T>
-  where T : Automobile // This constraint is optional, but I like to include it for clarity.
+public interface IAutomobileFactory<TSelf>
+    // Constrain the generic type parameter to types that self-reference using IAutomobileFactory<TSelf>.
+    // the Automobile constraint is optional in this example, but I like to include it for clarity.
+    where TSelf : Automobile, IAutomobileFactory<TSelf>
 {
-    static abstract T Create(string model);
+    static abstract TSelf Create(string model);
 }
 
 public abstract class Automobile(string model)
@@ -155,7 +157,7 @@ public IEnumerable<T> Create<T>(IEnumerable<string> models)
 
 ## Conclusion
 
-The main limitation of this approach is that you must be in control of the types of T. If `Car` and `Motorcycle`
+The main limitation of this approach is that you must be in control of the types of `T`. If `Car` and `Motorcycle`
 were implemented in a third-party library then you may not be able to mark them with the `IAutomobileFactory<T>` interface.
 Even if they implement the required static factory method, if it isn't marked with the interface then it won't work.
 This is unlike the `new()` constraint which can be used with any type that has a public parameterless constructor.
