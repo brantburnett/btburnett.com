@@ -39,7 +39,9 @@ the compiler then knows that the type will have certain members, it can allow yo
 the generic code.
 
 One such constraint is the `new()` constraint. This requires that the type have a public parameterless constructor.
-With this constraint, you can use the `new` keyword to construct an instance of the type. For example:
+With this constraint, you can use the `new` keyword to construct an instance of the type.
+
+Apologies in advance for the contrived example, but I promise scenarios like this do come up in real development.
 
 ```cs
 public abstract class Vehicle
