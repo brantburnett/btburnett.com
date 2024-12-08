@@ -15,7 +15,7 @@ As an application developer, I rarely get to dig into low-level C# code. I feel 
 
 For this year's C# Advent post, I decided to dust off an example of some low-level performance work I did last year. You'll actually find the changes in .NET starting with .NET 8, which I am inordinately proud of. It's just a minuscule little corner of the code that makes .NET tick, but I appreciate knowing I helped out just a tiny bit.
 
-While you shouldn't need to implement this specific example, since it's baked into .NET 8 and later, I think there's a lot to learn from the process. So, without further ado, let me tell a ~~little~~*long-winded* story about how it came to be.
+While you shouldn't need to implement this specific example, since it's baked into .NET 8 and later, I think there's a lot to learn from the process. So, without further ado, let me tell a ~~little~~ *long-winded* story about how it came to be.
 
 ## SIMD and Vectorization
 
@@ -132,7 +132,7 @@ checked { sum += TResult.CreateChecked(value); }
 
 The original code was explictly enabling overflow checking using the `checked` keyword. This causes an exception to be thrown if the value of the accumulator overflows the size of the integer type. This is done relatively inexpensively using flags on the CPU. When the CPU completes an add operation, it knows if there was an overflow or not and sets or clears the overflow flag. .NET emits a conditional jump operation (such as `jo` Jump if Overflow on x64) that branches to exception logic if that flag is set, so the only cost is the extra jump operation.
 
-A bit of quick Googling yielded the answer. For [Intel x86/x64](https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq): `When an individual result is too large to be represented in 32 bits (overflow), the result is wrapped around and the low 32 bits are written to the destination operand (that is, the carry is ignored)`. ARM NEON behaves similarly. This certainly explains why the .NET team hadn't implemented vectorization here. Overflows are just completely ignored by the CPU and thus my new code, so it isn't actually equivalent and would fail to throw exceptions.
+A bit of quick Googling yielded the answer. For [Intel x86/x64](https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq): `When an individual result is too large to be represented in 32 bits (overflow), the result is wrapped around and the low 32 bits are written to the destination operand (that is, the carry is ignored)`. ARM NEON behaves similarly. This certainly explains why the .NET team hadn't implemented vectorization for `Sum`. Overflows are just completely ignored by the CPU and thus my new code, so it isn't actually equivalent because it fails to throw exceptions.
 
 ## Climbing Out of the Pit of Despair
 
@@ -192,7 +192,7 @@ The next step after this was performance testing. To my chagrin, at first this n
 
 That said, while it was slower, it was only a little slower. A bit more work and we can get there. In the interests of not boring everyone to tears I'll simply summarize the final adjustments that I found after lots of experimentation and hair pulling.
 
-One change was to switch to using a `ref` variable instead of `Span<T>` within the loop. This is slightly riskier because now the framework isn't doing range checking for buffer overflows, our code must do it correctly instead. But it turns out to be worthwhile here.
+One change was to switch to using a `ref T` variable instead of `ReadOnlySpan<T>` within the loop. This is slightly riskier because now the framework isn't doing range checking for buffer overflows, our code must do it correctly instead. But it turns out to be worthwhile here.
 
 The most valuable change was using [loop unrolling](https://en.wikipedia.org/wiki/Loop_unrolling). I won't dig into the concept too deeply here, but the idea is to process more than one vector per loop. In this case, the loop is rewritten to process four vectors every time instead of one. This allows us to completely eliminate the assignment of `temp` back to `accumlator`. Instead, we alternate accumulators every other vector, which works so long as we have an even number of vectors in the loop. We can also check for overflows every four vectors instead of after each one, meaning fewer branches.
 
@@ -229,9 +229,9 @@ do
 This change did require increasing the minimum data length required to perform vectorization from
 two vectors to four vectors. Additionally, I added the requirement `Vector<T>.Count > 2`. On some CPUs, especially ARM,
 `Vector<T>` may be 128 bits. This means they can only hold two 64-bit `long` elements per vector.
-From a savings perspective, all of the overflow checking lift simply isn't worthwhile to add two
+From a savings perspective, all of the overflow checking effort simply isn't worthwhile to add two
 numbers at a time instead of one. So the vectored path only applies to `long` elements if the vector
-is at least 256-bit.
+is at least 256 bits.
 
 ## The Final Product
 
@@ -249,9 +249,10 @@ private static TResult Sum<T, TResult>(ReadOnlySpan<T> span)
         && Vector<T>.Count > 2
         && span.Length >= Vector<T>.Count * 4)
     {
-        // These magic branches are elided by JIT, they are required because SumSignedIntegersVectorized
-        // adds the IBinaryInteger<T>, ISignedNumber<T>, and IMinMaxValue<T> type constraints. They don't
-        // have any performance impact at runtime.
+        // These magic branches are elided by JIT, they are required because
+        // SumSignedIntegersVectorized adds the IBinaryInteger<T>, ISignedNumber<T>, 
+        // and IMinMaxValue<T> type constraints. They don't have any performance
+        // impact at runtime.
         if (typeof(T) == typeof(long))
         {
             return (TResult) (object) SumSignedIntegersVectorized(MemoryMarshal.Cast<T, long>(span));
